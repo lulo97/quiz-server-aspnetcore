@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Achievements == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Achievements.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Achievements == null)
           {
-              return NotFound();
+              return Problem();
           }
             var achievement = await _context.Achievements.FindAsync(id);
 
             if (achievement == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return achievement;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != achievement.AchievementId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(achievement).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!AchievementExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Achievements == null)
             {
-                return NotFound();
+                return Problem();
             }
             var achievement = await _context.Achievements.FindAsync(id);
             if (achievement == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Achievements.Remove(achievement);

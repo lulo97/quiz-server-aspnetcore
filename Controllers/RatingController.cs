@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Ratings == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Ratings.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Ratings == null)
           {
-              return NotFound();
+              return Problem();
           }
             var rating = await _context.Ratings.FindAsync(id);
 
             if (rating == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return rating;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != rating.RatingId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(rating).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!RatingExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Ratings == null)
             {
-                return NotFound();
+                return Problem();
             }
             var rating = await _context.Ratings.FindAsync(id);
             if (rating == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Ratings.Remove(rating);

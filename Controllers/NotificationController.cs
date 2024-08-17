@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Notifications == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Notifications.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Notifications == null)
           {
-              return NotFound();
+              return Problem();
           }
             var notification = await _context.Notifications.FindAsync(id);
 
             if (notification == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return notification;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != notification.NotificationId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(notification).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!NotificationExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Notifications == null)
             {
-                return NotFound();
+                return Problem();
             }
             var notification = await _context.Notifications.FindAsync(id);
             if (notification == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Notifications.Remove(notification);

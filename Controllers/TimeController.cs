@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Times == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Times.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Times == null)
           {
-              return NotFound();
+              return Problem();
           }
             var time = await _context.Times.FindAsync(id);
 
             if (time == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return time;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != time.TimeId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(time).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!TimeExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Times == null)
             {
-                return NotFound();
+                return Problem();
             }
             var time = await _context.Times.FindAsync(id);
             if (time == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Times.Remove(time);

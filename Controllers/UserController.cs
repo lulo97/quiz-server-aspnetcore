@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Users == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Users.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Users == null)
           {
-              return NotFound();
+              return Problem();
           }
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return user;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != user.UserId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(user).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!UserExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Users == null)
             {
-                return NotFound();
+                return Problem();
             }
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Users.Remove(user);

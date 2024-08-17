@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Quizzes == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Quizzes.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Quizzes == null)
           {
-              return NotFound();
+              return Problem();
           }
             var quiz = await _context.Quizzes.FindAsync(id);
 
             if (quiz == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return quiz;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != quiz.QuizId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(quiz).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!QuizExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Quizzes == null)
             {
-                return NotFound();
+                return Problem();
             }
             var quiz = await _context.Quizzes.FindAsync(id);
             if (quiz == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Quizzes.Remove(quiz);

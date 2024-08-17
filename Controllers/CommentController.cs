@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Comments == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Comments.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Comments == null)
           {
-              return NotFound();
+              return Problem();
           }
             var comment = await _context.Comments.FindAsync(id);
 
             if (comment == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return comment;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != comment.CommentId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(comment).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!CommentExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Comments == null)
             {
-                return NotFound();
+                return Problem();
             }
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Comments.Remove(comment);

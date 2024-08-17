@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Follows == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Follows.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Follows == null)
           {
-              return NotFound();
+              return Problem();
           }
             var follow = await _context.Follows.FindAsync(id);
 
             if (follow == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return follow;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != follow.FollowId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(follow).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!FollowExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Follows == null)
             {
-                return NotFound();
+                return Problem();
             }
             var follow = await _context.Follows.FindAsync(id);
             if (follow == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Follows.Remove(follow);

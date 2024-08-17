@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.ReportReasons == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.ReportReasons.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.ReportReasons == null)
           {
-              return NotFound();
+              return Problem();
           }
             var reportReason = await _context.ReportReasons.FindAsync(id);
 
             if (reportReason == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return reportReason;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != reportReason.ReportReasonId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(reportReason).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!ReportReasonExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.ReportReasons == null)
             {
-                return NotFound();
+                return Problem();
             }
             var reportReason = await _context.ReportReasons.FindAsync(id);
             if (reportReason == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.ReportReasons.Remove(reportReason);

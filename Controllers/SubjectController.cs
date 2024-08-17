@@ -2,6 +2,7 @@
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Backend.Utils.Const;
 
 namespace Backend.Controllers
 {
@@ -22,11 +23,10 @@ namespace Backend.Controllers
         {
             try
             {
-                if (_context.Subjects == null) return NotFound();
                 return await _context.Subjects.OrderBy(x => x.Name).ToListAsync();
             } catch
             {
-                return Problem("Lấy bản ghi thất bại!");
+                return Problem(READ_FAIL);
             }
         }
 
@@ -36,14 +36,14 @@ namespace Backend.Controllers
         {
             try
             {
-                if (_context.Subjects == null) return NotFound();
+                if (_context.Subjects == null) return Problem();
                 var subject = await _context.Subjects.FindAsync(id);
-                if (subject == null) return NotFound();
+                if (subject == null) return Problem();
                 
                 return subject;
             } catch
             {
-                return Problem("Lấy bản ghi thất bại!");
+                return Problem(READ_FAIL);
             }
         }
 
@@ -54,9 +54,10 @@ namespace Backend.Controllers
         {
             try
             {
-                if (!SubjectExists(id)) return NotFound("Mã không tồn tại!");
-                if (id != subject.SubjectId) return BadRequest("id không trùng mã bản ghi!");
-                if (subject.Name == null) return BadRequest("Tên trống!");
+                if (!SubjectExists(id)) return Problem(ID_NOT_FOUND);
+                if (id != subject.SubjectId) return Problem(ID_PARAM_NOT_MATCH);
+                if (subject.Name == null) return Problem(NAME_NULL);
+                if (IsHaveRecordWithSameName(subject)) return Problem(NAME_EXISTED);
 
                 subject.UpdatedAt = DateTime.Now;
 
@@ -67,7 +68,7 @@ namespace Backend.Controllers
             }
             catch
             {
-                return Problem("Sửa thất bại!");
+                return Problem(EDIT_FAIL);
             }
         }
 
@@ -78,9 +79,8 @@ namespace Backend.Controllers
         {
             try
             {
-                if (_context.Subjects == null) return Problem("Entity set 'ApplicationDbContext.Subjects'  is null.");
-                if (subject.Name == null) return BadRequest("Tên trống!");
-                //if (IsHaveRecordWithSameName(subject.Name)) return Problem("Tên đã tồn tại!");
+                if (subject.Name == null) return Problem(NAME_NULL);
+                if (IsHaveRecordWithSameName(subject)) return Problem(NAME_EXISTED);
 
                 _context.Subjects.Add(subject);
                 await _context.SaveChangesAsync();
@@ -89,7 +89,7 @@ namespace Backend.Controllers
             }
             catch
             {
-                return Problem("Thêm thất bại");
+                return Problem(ADD_FAIL);
             }
         }
 
@@ -99,10 +99,10 @@ namespace Backend.Controllers
         {
             try
             {
-                if (_context.Subjects == null) return NotFound();
+                if (_context.Subjects == null) return Problem();
                 
                 var subject = await _context.Subjects.FindAsync(id);
-                if (subject == null) return NotFound("Lấy bản ghi thất bại");
+                if (subject == null) return Problem(READ_FAIL);
                 
                 _context.Subjects.Remove(subject);
                 await _context.SaveChangesAsync();
@@ -111,7 +111,7 @@ namespace Backend.Controllers
             }
             catch
             {
-                return Problem("Xóa thất bại");
+                return Problem(DELETE_FAIL);
             }
 
         }
@@ -121,9 +121,9 @@ namespace Backend.Controllers
             return (_context.Subjects?.Any(e => e.SubjectId == id)).GetValueOrDefault();
         }
 
-        private bool IsHaveRecordWithSameName(string Name)
+        private bool IsHaveRecordWithSameName(Subject subject)
         {
-            return (_context.Subjects?.Any(e => e.Name == Name)).GetValueOrDefault();
+            return (_context.Subjects?.Any(e => e.Name == subject.Name && e.SubjectId != subject.SubjectId)).GetValueOrDefault();
         }
     }
 }

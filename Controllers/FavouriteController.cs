@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Favourites == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Favourites.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Favourites == null)
           {
-              return NotFound();
+              return Problem();
           }
             var favourite = await _context.Favourites.FindAsync(id);
 
             if (favourite == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return favourite;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != favourite.FavouriteId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(favourite).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!FavouriteExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Favourites == null)
             {
-                return NotFound();
+                return Problem();
             }
             var favourite = await _context.Favourites.FindAsync(id);
             if (favourite == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Favourites.Remove(favourite);

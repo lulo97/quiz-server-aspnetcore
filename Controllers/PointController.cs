@@ -22,7 +22,7 @@ namespace Backend.Controllers
         {
             if (_context.Points == null)
             {
-                return NotFound();
+                return Problem();
             }
             return await _context.Points.OrderBy(x => x.Value).OrderBy(x => x.IsPenalty).ToListAsync();
         }
@@ -33,13 +33,13 @@ namespace Backend.Controllers
         {
             if (_context.Points == null)
             {
-                return NotFound();
+                return Problem();
             }
             var point = await _context.Points.FindAsync(id);
 
             if (point == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return point;
@@ -52,7 +52,7 @@ namespace Backend.Controllers
         {
             if (id != point.PointId)
             {
-                return BadRequest();
+                return Problem();
             }
             if (IsHavePointWithSameValue(point.Value, point.IsPenalty)) return Problem("Loại điểm này đã có giá trị điểm tồn tại!");
 
@@ -66,7 +66,7 @@ namespace Backend.Controllers
             {
                 if (!PointExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -96,12 +96,12 @@ namespace Backend.Controllers
         {
             if (_context.Points == null)
             {
-                return NotFound();
+                return Problem();
             }
             var point = await _context.Points.FindAsync(id);
             if (point == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Points.Remove(point);

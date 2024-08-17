@@ -22,7 +22,7 @@ namespace Backend.Controllers
         {
             if (_context.EducationLevels == null)
             {
-                return NotFound();
+                return Problem();
             }
             return await _context.EducationLevels.OrderBy(x => x.Name).ToListAsync();
         }
@@ -33,13 +33,13 @@ namespace Backend.Controllers
         {
             if (_context.EducationLevels == null)
             {
-                return NotFound();
+                return Problem();
             }
             var educationLevel = await _context.EducationLevels.FindAsync(id);
 
             if (educationLevel == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return educationLevel;
@@ -52,9 +52,9 @@ namespace Backend.Controllers
         {
             if (id != educationLevel.EducationLevelId)
             {
-                return BadRequest();
+                return Problem();
             }
-            if (educationLevel.Name == null) return Problem("Tên trống!");
+            if (educationLevel.Name == null) return Problem(NAME_NULL);
 
             _context.Entry(educationLevel).State = EntityState.Modified;
 
@@ -66,7 +66,7 @@ namespace Backend.Controllers
             {
                 if (!EducationLevelExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -84,8 +84,8 @@ namespace Backend.Controllers
         {
             if (_context.EducationLevels == null)
                 return Problem("Entity set 'ApplicationDbContext.EducationLevels'  is null.");
-            if (educationLevel.Name == null) return Problem("Tên trống!");
-            if (IsHaveRecordWithSameName(educationLevel.Name)) return Problem("Tên đã tồn tại!");
+            if (educationLevel.Name == null) return Problem(NAME_NULL);
+            if (IsHaveRecordWithSameName(educationLevel.Name)) return Problem(NAME_EXISTED);
 
             _context.EducationLevels.Add(educationLevel);
             await _context.SaveChangesAsync();
@@ -99,12 +99,12 @@ namespace Backend.Controllers
         {
             if (_context.EducationLevels == null)
             {
-                return NotFound();
+                return Problem();
             }
             var educationLevel = await _context.EducationLevels.FindAsync(id);
             if (educationLevel == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.EducationLevels.Remove(educationLevel);

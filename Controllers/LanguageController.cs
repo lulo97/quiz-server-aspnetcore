@@ -3,6 +3,7 @@ using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Backend.Utils.cón
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -20,11 +21,15 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Language>>> GetLanguages()
         {
-            if (_context.Languages == null)
+            try
             {
-                return NotFound();
-            }
-            return await _context.Languages.OrderBy(x => x.Name).ToListAsync();
+                if (_context.Languages == null)
+                {
+                    return Problem();
+                }
+                return await _context.Languages.OrderBy(x => x.Name).ToListAsync();
+            } catch { }
+
         }
 
         // GET: api/Language/5
@@ -33,13 +38,13 @@ namespace Backend.Controllers
         {
             if (_context.Languages == null)
             {
-                return NotFound();
+                return Problem();
             }
             var language = await _context.Languages.FindAsync(id);
 
             if (language == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return language;
@@ -50,32 +55,22 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLanguage(Guid id, Language language)
         {
-            if (id != language.LanguageId)
-            {
-                return BadRequest();
-            }
-
-            if (language.Name == null) return Problem("Tên trống!");
-
-            _context.Entry(language).State = EntityState.Modified;
-
             try
             {
+                if (id != language.LanguageId) return Problem("id không khớp mã bản ghi");
+                if (!LanguageExists(id)) return Problem("Không tìm thấy mã bản ghi");
+                if (language.Name == null) return Problem(NAME_NULL);
+                if (IsHaveRecordWithSameName(language)) return Problem(NAME_EXISTED);
+
+                _context.Entry(language).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
+
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!LanguageExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Problem("Sửa thất bại");
             }
-
-            return NoContent();
         }
 
         // POST: api/Language
@@ -83,15 +78,23 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Language>> PostLanguage(Language language)
         {
-            if (_context.Languages == null)
-                return Problem("Entity set 'ApplicationDbContext.Languages'  is null.");
-            if (language.Name == null) return Problem("Tên trống!");
-            if (IsHaveRecordWithSameName(language.Name)) return Problem("Tên đã tồn tại!");
+            try
+            {
+                if (_context.Languages == null)
+                    return Problem("Entity set 'ApplicationDbContext.Languages'  is null.");
+                if (language.Name == null) return Problem(NAME_NULL);
+                if (IsHaveRecordWithSameName(language)) return Problem(NAME_EXISTED);
 
-            _context.Languages.Add(language);
-            await _context.SaveChangesAsync();
+                _context.Languages.Add(language);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetLanguage", new { id = language.LanguageId }, language);
+                return CreatedAtAction("GetLanguage", new { id = language.LanguageId }, language);
+            }
+            catch
+            {
+                return Problem("Thêm thất bại!");
+            }
+
         }
 
         // DELETE: api/Language/5
@@ -100,12 +103,12 @@ namespace Backend.Controllers
         {
             if (_context.Languages == null)
             {
-                return NotFound();
+                return Problem();
             }
             var language = await _context.Languages.FindAsync(id);
             if (language == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Languages.Remove(language);
@@ -119,9 +122,9 @@ namespace Backend.Controllers
             return (_context.Languages?.Any(e => e.LanguageId == id)).GetValueOrDefault();
         }
 
-        private bool IsHaveRecordWithSameName(string Name)
+        private bool IsHaveRecordWithSameName(Language language)
         {
-            return (_context.Languages?.Any(e => e.Name == Name)).GetValueOrDefault();
+            return (_context.Languages?.Any(e => e.Name == language.Name && e.LanguageId != language.LanguageId)).GetValueOrDefault();
         }
     }
 }

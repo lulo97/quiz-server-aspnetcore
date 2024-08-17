@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.SelectedAnswers == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.SelectedAnswers.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.SelectedAnswers == null)
           {
-              return NotFound();
+              return Problem();
           }
             var selectedAnswer = await _context.SelectedAnswers.FindAsync(id);
 
             if (selectedAnswer == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return selectedAnswer;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != selectedAnswer.SelectedAnswerId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(selectedAnswer).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!SelectedAnswerExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.SelectedAnswers == null)
             {
-                return NotFound();
+                return Problem();
             }
             var selectedAnswer = await _context.SelectedAnswers.FindAsync(id);
             if (selectedAnswer == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.SelectedAnswers.Remove(selectedAnswer);

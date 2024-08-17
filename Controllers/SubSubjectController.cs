@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Backend.Data;
+using Backend.DTOs;
+using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Backend.Data;
-using Backend.Models;
+using static Backend.Utils.Const;
 
 namespace Backend.Controllers
 {
@@ -23,31 +20,46 @@ namespace Backend.Controllers
 
         // GET: api/SubSubject
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SubSubject>>> GetSubSubjects()
+        public async Task<ActionResult<IEnumerable<SubSubjectDTO>>> GetSubSubjects()
         {
-          if (_context.SubSubjects == null)
-          {
-              return NotFound();
-          }
-            return await _context.SubSubjects.OrderBy(x => x.Name).ToListAsync();
+            try
+            {
+                return await _context.SubSubjects
+                    .Include(x => x.Subject)
+                    .Include(x => x.EducationLevel)
+                    .OrderBy(x => x.Name)
+                    .Select(x => new SubSubjectDTO
+                    {
+                        SubSubjectId = x.SubSubjectId,
+                        SubjectId = x.SubjectId,
+                        EducationLevelId = x.EducationLevelId,
+                        Name = x.Name,
+                        Description = x.Description,
+                        CreatedAt = x.CreatedAt,
+                        UpdatedAt = x.UpdatedAt,
+                        SubjectName = x.Subject != null ? x.Subject.Name : null,
+                        EducationLevelName = x.EducationLevel != null ? x.EducationLevel.Name : null
+                    })
+                    .ToListAsync();
+            }
+            catch
+            {
+                return Problem(READ_FAIL);
+            }
+
         }
 
         // GET: api/SubSubject/5
         [HttpGet("{id}")]
         public async Task<ActionResult<SubSubject>> GetSubSubject(Guid id)
         {
-          if (_context.SubSubjects == null)
-          {
-              return NotFound();
-          }
-            var subSubject = await _context.SubSubjects.FindAsync(id);
-
-            if (subSubject == null)
+            try
             {
-                return NotFound();
+                var subSubject = await _context.SubSubjects.FindAsync(id);
+                if (subSubject == null) return Problem(READ_FAIL);
+                return subSubject;
             }
-
-            return subSubject;
+            catch { return Problem(READ_FAIL); }
         }
 
         // PUT: api/SubSubject/5
@@ -55,30 +67,25 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSubSubject(Guid id, SubSubject subSubject)
         {
-            if (id != subSubject.SubSubjectId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(subSubject).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SubSubjectExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                if (subSubject.Name == null) return Problem(NAME_NULL);
+                if (id != subSubject.SubSubjectId) return Problem(ID_PARAM_NOT_MATCH);
+                if (!SubSubjectExists(id)) return Problem(ID_NOT_FOUND);
+                if (subSubject.SubSubjectId == Guid.Empty) return Problem(SUBJECT_ID_NULL);
+                if (subSubject.EducationLevelId == Guid.Empty) return Problem(EDUCATION_LEVEL_ID_NULL);
+                if (IsHaveRecordWithSame(subSubject)) return Problem(RECORD_CONTENT_EXISTED);
 
-            return NoContent();
+                _context.Entry(subSubject).State = EntityState.Modified;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch
+            {
+                return Problem(EDIT_FAIL);
+            }
         }
 
         // POST: api/SubSubject
@@ -86,39 +93,55 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<SubSubject>> PostSubSubject(SubSubject subSubject)
         {
-          if (_context.SubSubjects == null)
-          {
-              return Problem("Entity set 'ApplicationDbContext.SubSubjects'  is null.");
-          }
-            _context.SubSubjects.Add(subSubject);
-            await _context.SaveChangesAsync();
+            try
+            {
+                if (subSubject.Name == null) return Problem(NAME_NULL);
+                if (subSubject.SubSubjectId == Guid.Empty) return Problem(SUBJECT_ID_NULL);
+                if (subSubject.EducationLevelId == Guid.Empty) return Problem(EDUCATION_LEVEL_ID_NULL);
+                if (IsHaveRecordWithSame(subSubject)) return Problem(RECORD_CONTENT_EXISTED);
 
-            return CreatedAtAction("GetSubSubject", new { id = subSubject.SubSubjectId }, subSubject);
+                _context.SubSubjects.Add(subSubject);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetSubSubject", new { id = subSubject.SubSubjectId }, subSubject);
+            }
+            catch
+            {
+                return Problem(ADD_FAIL);
+            }
+
         }
 
         // DELETE: api/SubSubject/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubSubject(Guid id)
         {
-            if (_context.SubSubjects == null)
+            try
             {
-                return NotFound();
+                var subSubject = await _context.SubSubjects.FindAsync(id);
+                if (subSubject == null) return Problem(READ_FAIL);
+                _context.SubSubjects.Remove(subSubject);
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
-            var subSubject = await _context.SubSubjects.FindAsync(id);
-            if (subSubject == null)
-            {
-                return NotFound();
-            }
+            catch { return Problem(DELETE_FAIL); }
 
-            _context.SubSubjects.Remove(subSubject);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool SubSubjectExists(Guid id)
         {
             return (_context.SubSubjects?.Any(e => e.SubSubjectId == id)).GetValueOrDefault();
+        }
+
+        private bool IsHaveRecordWithSame(SubSubject subSubject)
+        {
+            //Check if combination Name, Subject, Education already exist
+            return (_context.SubSubjects?.Any(
+                    x => x.Name == subSubject.Name
+                && x.SubjectId == subSubject.SubjectId
+                && x.EducationLevelId == subSubject.EducationLevelId
+                && x.SubSubjectId != subSubject.SubSubjectId
+            )).GetValueOrDefault();
         }
     }
 }

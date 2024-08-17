@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.UserRooms == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.UserRooms.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.UserRooms == null)
           {
-              return NotFound();
+              return Problem();
           }
             var userRoom = await _context.UserRooms.FindAsync(id);
 
             if (userRoom == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return userRoom;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != userRoom.UserRoomId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(userRoom).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!UserRoomExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.UserRooms == null)
             {
-                return NotFound();
+                return Problem();
             }
             var userRoom = await _context.UserRooms.FindAsync(id);
             if (userRoom == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.UserRooms.Remove(userRoom);

@@ -22,7 +22,7 @@ namespace Backend.Controllers
         {
             if (_context.DifficultLevels == null)
             {
-                return NotFound();
+                return Problem();
             }
             return await _context.DifficultLevels.OrderBy(x => x.Name).ToListAsync();
         }
@@ -33,13 +33,13 @@ namespace Backend.Controllers
         {
             if (_context.DifficultLevels == null)
             {
-                return NotFound();
+                return Problem();
             }
             var difficultLevel = await _context.DifficultLevels.FindAsync(id);
 
             if (difficultLevel == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return difficultLevel;
@@ -52,10 +52,10 @@ namespace Backend.Controllers
         {
             if (id != difficultLevel.DifficultLevelId)
             {
-                return BadRequest();
+                return Problem();
             }
 
-            if (difficultLevel.Name == null) return Problem("Tên trống!");
+            if (difficultLevel.Name == null) return Problem(NAME_NULL);
 
             _context.Entry(difficultLevel).State = EntityState.Modified;
 
@@ -67,7 +67,7 @@ namespace Backend.Controllers
             {
                 if (!DifficultLevelExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -85,8 +85,8 @@ namespace Backend.Controllers
         {
             if (_context.DifficultLevels == null)
                 return Problem("Entity set 'ApplicationDbContext.DifficultLevels'  is null.");
-            if (difficultLevel.Name == null) return Problem("Tên trống!");
-            if (IsHaveRecordWithSameName(difficultLevel.Name)) return Problem("Tên đã tồn tại!");
+            if (difficultLevel.Name == null) return Problem(NAME_NULL);
+            if (IsHaveRecordWithSameName(difficultLevel.Name)) return Problem(NAME_EXISTED);
 
             _context.DifficultLevels.Add(difficultLevel);
             await _context.SaveChangesAsync();
@@ -100,12 +100,12 @@ namespace Backend.Controllers
         {
             if (_context.DifficultLevels == null)
             {
-                return NotFound();
+                return Problem();
             }
             var difficultLevel = await _context.DifficultLevels.FindAsync(id);
             if (difficultLevel == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.DifficultLevels.Remove(difficultLevel);

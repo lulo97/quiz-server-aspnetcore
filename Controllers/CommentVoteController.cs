@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.CommentVotes == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.CommentVotes.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.CommentVotes == null)
           {
-              return NotFound();
+              return Problem();
           }
             var commentVote = await _context.CommentVotes.FindAsync(id);
 
             if (commentVote == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return commentVote;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != commentVote.CommentVoteId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(commentVote).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!CommentVoteExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.CommentVotes == null)
             {
-                return NotFound();
+                return Problem();
             }
             var commentVote = await _context.CommentVotes.FindAsync(id);
             if (commentVote == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.CommentVotes.Remove(commentVote);

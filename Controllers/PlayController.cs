@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.Plays == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.Plays.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.Plays == null)
           {
-              return NotFound();
+              return Problem();
           }
             var play = await _context.Plays.FindAsync(id);
 
             if (play == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return play;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != play.PlayId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(play).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!PlayExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.Plays == null)
             {
-                return NotFound();
+                return Problem();
             }
             var play = await _context.Plays.FindAsync(id);
             if (play == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.Plays.Remove(play);

@@ -27,7 +27,7 @@ namespace Backend.Controllers
         {
           if (_context.QuestionTypes == null)
           {
-              return NotFound();
+              return Problem();
           }
             return await _context.QuestionTypes.ToListAsync();
         }
@@ -38,13 +38,13 @@ namespace Backend.Controllers
         {
           if (_context.QuestionTypes == null)
           {
-              return NotFound();
+              return Problem();
           }
             var questionType = await _context.QuestionTypes.FindAsync(id);
 
             if (questionType == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return questionType;
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             if (id != questionType.QuestionTypeId)
             {
-                return BadRequest();
+                return Problem();
             }
 
             _context.Entry(questionType).State = EntityState.Modified;
@@ -70,7 +70,7 @@ namespace Backend.Controllers
             {
                 if (!QuestionTypeExists(id))
                 {
-                    return NotFound();
+                    return Problem();
                 }
                 else
                 {
@@ -102,12 +102,12 @@ namespace Backend.Controllers
         {
             if (_context.QuestionTypes == null)
             {
-                return NotFound();
+                return Problem();
             }
             var questionType = await _context.QuestionTypes.FindAsync(id);
             if (questionType == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             _context.QuestionTypes.Remove(questionType);

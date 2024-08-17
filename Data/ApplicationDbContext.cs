@@ -18,7 +18,11 @@ namespace Backend.Data
             modelBuilder.Entity<EducationLevel>().HasIndex(x => x.Name).IsUnique();
             modelBuilder.Entity<Language>().HasIndex(x => x.Name).IsUnique();
             modelBuilder.Entity<Subject>().HasIndex(x => x.Name).IsUnique();
-            modelBuilder.Entity<SubSubject>().HasIndex(x => x.Name).IsUnique();
+
+            modelBuilder.Entity<SubSubject>()
+                .HasIndex(x => new { x.Name, x.SubjectId, x.EducationLevelId })
+                .IsUnique();
+
             modelBuilder.Entity<QuestionType>().HasIndex(x => x.Name).IsUnique();
             modelBuilder.Entity<Point>().HasIndex(x => x.Value).IsUnique();
 
