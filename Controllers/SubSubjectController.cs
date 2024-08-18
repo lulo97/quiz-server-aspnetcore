@@ -71,7 +71,7 @@ namespace Backend.Controllers
             {
                 if (subSubject.Name == null) return Problem(NAME_NULL);
                 if (id != subSubject.SubSubjectId) return Problem(ID_PARAM_NOT_MATCH);
-                if (!SubSubjectExists(id)) return Problem(ID_NOT_FOUND);
+                if (!SubSubjectExists(id)) return Problem(RECORD_NOT_FOUND);
                 if (subSubject.SubSubjectId == Guid.Empty) return Problem(SUBJECT_ID_NULL);
                 if (subSubject.EducationLevelId == Guid.Empty) return Problem(EDUCATION_LEVEL_ID_NULL);
                 if (IsHaveRecordWithSame(subSubject)) return Problem(RECORD_CONTENT_EXISTED);
@@ -124,8 +124,10 @@ namespace Backend.Controllers
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
-            catch { return Problem(DELETE_FAIL); }
-
+            catch (Exception)
+            {
+                return Problem(DELETE_FAIL);
+            }
         }
 
         private bool SubSubjectExists(Guid id)

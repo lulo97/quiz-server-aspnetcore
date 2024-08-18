@@ -2,6 +2,7 @@
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Backend.Utils.Const;
 
 namespace Backend.Controllers
 {
@@ -20,29 +21,31 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DifficultLevel>>> GetDifficultLevels()
         {
-            if (_context.DifficultLevels == null)
+            try
             {
-                return Problem();
+                return await _context.DifficultLevels.OrderBy(x => x.Name).ToListAsync();
+
             }
-            return await _context.DifficultLevels.OrderBy(x => x.Name).ToListAsync();
+            catch (Exception)
+            {
+                return Problem(READ_FAIL);
+            }
         }
 
         // GET: api/DifficultLevel/5
         [HttpGet("{id}")]
         public async Task<ActionResult<DifficultLevel>> GetDifficultLevel(Guid id)
         {
-            if (_context.DifficultLevels == null)
+            try
             {
-                return Problem();
+                var difficultLevel = await _context.DifficultLevels.FindAsync(id);
+                if (difficultLevel == null) return Problem(RECORD_NOT_FOUND);
+                return difficultLevel;
             }
-            var difficultLevel = await _context.DifficultLevels.FindAsync(id);
-
-            if (difficultLevel == null)
+            catch (Exception)
             {
-                return Problem();
+                return Problem(READ_FAIL);
             }
-
-            return difficultLevel;
         }
 
         // PUT: api/DifficultLevel/5
@@ -50,29 +53,19 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDifficultLevel(Guid id, DifficultLevel difficultLevel)
         {
-            if (id != difficultLevel.DifficultLevelId)
-            {
-                return Problem();
-            }
-
-            if (difficultLevel.Name == null) return Problem(NAME_NULL);
-
-            _context.Entry(difficultLevel).State = EntityState.Modified;
-
             try
             {
+                if (!DifficultLevelExists(id)) return Problem(RECORD_NOT_FOUND);
+                if (id != difficultLevel.DifficultLevelId) return Problem(ID_PARAM_NOT_MATCH);
+                if (difficultLevel.Name == null) return Problem(NAME_NULL);
+                if (IsHaveRecordWithSameName(difficultLevel)) return Problem(NAME_EXISTED);
+
+                _context.Entry(difficultLevel).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                if (!DifficultLevelExists(id))
-                {
-                    return Problem();
-                }
-                else
-                {
-                    throw;
-                }
+                return Problem(EDIT_FAIL);
             }
 
             return NoContent();
@@ -83,35 +76,40 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<DifficultLevel>> PostDifficultLevel(DifficultLevel difficultLevel)
         {
-            if (_context.DifficultLevels == null)
-                return Problem("Entity set 'ApplicationDbContext.DifficultLevels'  is null.");
-            if (difficultLevel.Name == null) return Problem(NAME_NULL);
-            if (IsHaveRecordWithSameName(difficultLevel.Name)) return Problem(NAME_EXISTED);
+            try
+            {
+                if (difficultLevel.Name == null) return Problem(NAME_NULL);
+                if (IsHaveRecordWithSameName(difficultLevel)) return Problem(NAME_EXISTED);
 
-            _context.DifficultLevels.Add(difficultLevel);
-            await _context.SaveChangesAsync();
+                _context.DifficultLevels.Add(difficultLevel);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDifficultLevel", new { id = difficultLevel.DifficultLevelId }, difficultLevel);
+                return CreatedAtAction("GetDifficultLevel", new { id = difficultLevel.DifficultLevelId }, difficultLevel);
+            }
+            catch (Exception)
+            {
+                return Problem(ADD_FAIL);
+            }
         }
 
         // DELETE: api/DifficultLevel/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDifficultLevel(Guid id)
         {
-            if (_context.DifficultLevels == null)
+            try
             {
-                return Problem();
+                var difficultLevel = await _context.DifficultLevels.FindAsync(id);
+                if (difficultLevel == null) return Problem(RECORD_NOT_FOUND);
+
+                _context.DifficultLevels.Remove(difficultLevel);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-            var difficultLevel = await _context.DifficultLevels.FindAsync(id);
-            if (difficultLevel == null)
+            catch (Exception)
             {
-                return Problem();
+                return Problem(DELETE_FAIL);
             }
-
-            _context.DifficultLevels.Remove(difficultLevel);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool DifficultLevelExists(Guid id)
@@ -119,9 +117,9 @@ namespace Backend.Controllers
             return (_context.DifficultLevels?.Any(e => e.DifficultLevelId == id)).GetValueOrDefault();
         }
 
-        private bool IsHaveRecordWithSameName(string Name)
+        private bool IsHaveRecordWithSameName(DifficultLevel difficultLevel)
         {
-            return (_context.DifficultLevels?.Any(e => e.Name == Name)).GetValueOrDefault();
+            return (_context.DifficultLevels?.Any(e => e.Name == difficultLevel.Name && e.DifficultLevelId != difficultLevel.DifficultLevelId)).GetValueOrDefault();
         }
     }
 }
