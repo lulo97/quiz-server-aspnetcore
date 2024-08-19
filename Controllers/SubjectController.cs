@@ -46,7 +46,7 @@ namespace Backend.Controllers
         {
             try
             {
-                if (_context.Subjects == null) return Problem();
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var record = await _context.Subjects.FindAsync(id);
                 if (record == null) return Problem();
 
@@ -73,6 +73,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 if (!SubjectExists(id)) return Problem(RECORD_NOT_FOUND);
                 if (id != subject.SubjectId) return Problem(ID_PARAM_NOT_MATCH);
                 if (subject.Name == null) return Problem(NAME_NULL);
@@ -116,7 +117,7 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubject(Guid id)
         {
-            if (_context.Subjects == null) return Problem();
+            if (id == Guid.Empty) return Problem(ID_NULL);
             var subject = await _context.Subjects.FindAsync(id);
             if (subject == null) return Problem(READ_FAIL);
             try

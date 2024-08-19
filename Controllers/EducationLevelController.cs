@@ -46,6 +46,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var record = await _context.EducationLevels.FindAsync(id);
                 if (record == null) return Problem(RECORD_NOT_FOUND);
                 return new EducationLevelDTO
@@ -71,6 +72,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 if (!EducationLevelExists(id)) return Problem(RECORD_NOT_FOUND);
                 if (id != educationLevel.EducationLevelId) return Problem(ID_PARAM_NOT_MATCH);
                 if (educationLevel.Name == null) return Problem(NAME_NULL);
@@ -112,6 +114,7 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEducationLevel(Guid id)
         {
+            if (id == Guid.Empty) return Problem(ID_NULL);
             var educationLevel = await _context.EducationLevels.FindAsync(id);
             if (educationLevel == null) return Problem(RECORD_NOT_FOUND);
             try

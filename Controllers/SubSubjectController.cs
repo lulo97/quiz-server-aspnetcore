@@ -55,6 +55,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var subSubject = await _context.SubSubjects.FindAsync(id);
                 if (subSubject == null) return Problem(READ_FAIL);
                 return subSubject;
@@ -69,6 +70,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 if (subSubject.Name == null) return Problem(NAME_NULL);
                 if (id != subSubject.SubSubjectId) return Problem(ID_PARAM_NOT_MATCH);
                 if (!SubSubjectExists(id)) return Problem(RECORD_NOT_FOUND);
@@ -118,6 +120,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var subSubject = await _context.SubSubjects.FindAsync(id);
                 if (subSubject == null) return Problem(READ_FAIL);
                 _context.SubSubjects.Remove(subSubject);

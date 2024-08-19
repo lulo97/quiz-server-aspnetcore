@@ -2,6 +2,7 @@
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Backend.Utils.Const;
 
 namespace Backend.Controllers
 {
@@ -20,29 +21,31 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Point>>> GetPoints()
         {
-            if (_context.Points == null)
+            try
             {
-                return Problem();
+                return await _context.Points.OrderBy(x => x.IsPenalty).ThenBy(x => x.Value).ToListAsync();
             }
-            return await _context.Points.OrderBy(x => x.Value).OrderBy(x => x.IsPenalty).ToListAsync();
+            catch (Exception)
+            {
+                return Problem(READ_FAIL);
+            }
         }
 
         // GET: api/Point/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Point>> GetPoint(Guid id)
         {
-            if (_context.Points == null)
+            try
             {
-                return Problem();
+                if (id == Guid.Empty) return Problem(ID_NULL);
+                var point = await _context.Points.FindAsync(id);
+                if (point == null) return Problem(RECORD_NOT_FOUND);
+                return point;
             }
-            var point = await _context.Points.FindAsync(id);
-
-            if (point == null)
+            catch (Exception)
             {
-                return Problem();
+                return Problem(READ_FAIL);
             }
-
-            return point;
         }
 
         // PUT: api/Point/5
@@ -50,31 +53,22 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPoint(Guid id, Point point)
         {
-            if (id != point.PointId)
-            {
-                return Problem();
-            }
-            if (IsHavePointWithSameValue(point.Value, point.IsPenalty)) return Problem("Loại điểm này đã có giá trị điểm tồn tại!");
-
-            _context.Entry(point).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PointExists(id))
-                {
-                    return Problem();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                if (id != Guid.Empty) return Problem(ID_NULL);
+                if (id != point.PointId) return Problem(ID_PARAM_NOT_MATCH);
+                if (!PointExists(id)) return Problem(RECORD_NOT_FOUND);
+                if (IsHavePointWithSameValue(point)) return Problem(RECORD_CONTENT_EXISTED);
 
-            return NoContent();
+                _context.Entry(point).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return Problem(EDIT_FAIL);
+            }
         }
 
         // POST: api/Point
@@ -82,32 +76,39 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Point>> PostPoint(Point point)
         {
-            if (_context.Points == null) return Problem("Entity set 'ApplicationDbContext.Points'  is null.");
-            if (IsHavePointWithSameValue(point.Value, point.IsPenalty)) return Problem("Loại điểm này đã có giá trị điểm tồn tại!");
-            _context.Points.Add(point);
-            await _context.SaveChangesAsync();
+            try
+            {
+                if (IsHavePointWithSameValue(point)) return Problem(RECORD_CONTENT_EXISTED);
+                _context.Points.Add(point);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPoint", new { id = point.PointId }, point);
+                return CreatedAtAction("GetPoint", new { id = point.PointId }, point);
+            }
+            catch (Exception)
+            {
+                return Problem(ADD_FAIL);
+            }
         }
 
         // DELETE: api/Point/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePoint(Guid id)
         {
-            if (_context.Points == null)
+            try
             {
-                return Problem();
+                if (id != Guid.Empty) return Problem(ID_NULL);
+                var point = await _context.Points.FindAsync(id);
+                if (point == null) return Problem(RECORD_NOT_FOUND);
+                if (IsHavePointWithSameValue(point)) return Problem(RECORD_CONTENT_EXISTED);
+
+                _context.Points.Remove(point);
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
-            var point = await _context.Points.FindAsync(id);
-            if (point == null)
+            catch (Exception)
             {
-                return Problem();
+                return Problem(DELETE_FAIL);
             }
-
-            _context.Points.Remove(point);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool PointExists(Guid id)
@@ -117,9 +118,9 @@ namespace Backend.Controllers
 
         //In c# & is bitwise AND, which mean both side of expression is evaluated everytime
         //&& is conditional AND, if first expression is false then return false
-        private bool IsHavePointWithSameValue(int Value, bool IsPenalty)
+        private bool IsHavePointWithSameValue(Point point)
         {
-            return (_context.Points?.Any(e => (e.Value == Value & e.IsPenalty == IsPenalty))).GetValueOrDefault();
+            return (_context.Points?.Any(e => (e.Value == point.Value & e.IsPenalty == point.IsPenalty))).GetValueOrDefault();
         }
     }
 }

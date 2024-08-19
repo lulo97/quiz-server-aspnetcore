@@ -12,13 +12,17 @@ Generate controller by model:
 using DotNetEnv;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Backend;
+using static Backend.Utils.Const;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+// Add services controller, json
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.WriteIndented = true;
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -29,8 +33,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure port
-Env.Load(@"D:\TULAM\LinhTinh\QuizQuestAngularASP.NETCore\.env");
-builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(Const.getPort()));
+Env.Load(builder.Configuration.GetValue<string>("EnvPath"));
+builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(Int32.Parse(BACKEND_PORT)));
 
 var app = builder.Build();
 

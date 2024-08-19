@@ -18,13 +18,14 @@ namespace Backend.Data
             modelBuilder.Entity<EducationLevel>().HasIndex(x => x.Name).IsUnique();
             modelBuilder.Entity<Language>().HasIndex(x => x.Name).IsUnique();
             modelBuilder.Entity<Subject>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<QuestionType>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<Book>().HasIndex(x => x.Name).IsUnique();
 
+            //Add a combination of unique columns
             modelBuilder.Entity<SubSubject>()
                 .HasIndex(x => new { x.Name, x.SubjectId, x.EducationLevelId })
                 .IsUnique();
-
-            modelBuilder.Entity<QuestionType>().HasIndex(x => x.Name).IsUnique();
-            modelBuilder.Entity<Point>().HasIndex(x => x.Value).IsUnique();
+            modelBuilder.Entity<Point>().HasIndex(x => new { x.Value, x.IsPenalty }).IsUnique();
 
             //Add check constraint = HasCheckConstraint
             modelBuilder.Entity<Point>().ToTable(x => x.HasCheckConstraint("CC_Point_Value", "[Value] > 0"));
@@ -66,11 +67,11 @@ namespace Backend.Data
                 .WithMany(s => s.SubSubjects) // Each Subject has many SubSubjects
                 .HasForeignKey(ss => ss.EducationLevelId)
                 .OnDelete(DeleteBehavior.Restrict);// SubjectId is the foreign key
-
         }
 
         public DbSet<Achievement> Achievements { get; set; }
         public DbSet<Answer> Answers { get; set; }
+        public DbSet<Book> Books { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<CommentVote> CommentVotes { get; set; }
         public DbSet<DifficultLevel> DifficultLevels { get; set; }

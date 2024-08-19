@@ -35,6 +35,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var language = await _context.Languages.FindAsync(id);
                 if (language == null) return Problem(RECORD_NOT_FOUND);
                 return language;
@@ -52,6 +53,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 if (id != language.LanguageId) return Problem(ID_PARAM_NOT_MATCH);
                 if (!LanguageExists(id)) return Problem(RECORD_NOT_FOUND);
                 if (language.Name == null) return Problem(NAME_NULL);
@@ -96,6 +98,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var language = await _context.Languages.FindAsync(id);
                 if (language == null) return Problem(RECORD_NOT_FOUND);
 

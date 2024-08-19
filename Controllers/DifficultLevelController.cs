@@ -38,6 +38,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var difficultLevel = await _context.DifficultLevels.FindAsync(id);
                 if (difficultLevel == null) return Problem(RECORD_NOT_FOUND);
                 return difficultLevel;
@@ -55,6 +56,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 if (!DifficultLevelExists(id)) return Problem(RECORD_NOT_FOUND);
                 if (id != difficultLevel.DifficultLevelId) return Problem(ID_PARAM_NOT_MATCH);
                 if (difficultLevel.Name == null) return Problem(NAME_NULL);
@@ -98,6 +100,7 @@ namespace Backend.Controllers
         {
             try
             {
+                if (id == Guid.Empty) return Problem(ID_NULL);
                 var difficultLevel = await _context.DifficultLevels.FindAsync(id);
                 if (difficultLevel == null) return Problem(RECORD_NOT_FOUND);
 
