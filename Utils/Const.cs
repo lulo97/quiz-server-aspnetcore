@@ -2,7 +2,8 @@
 {
     public static class Const
     {
-        public static string BACKEND_PORT = Environment.GetEnvironmentVariable("BACKEND_PORT") ?? throw new Exception("PORT is null!");
+        public static string BACKEND_PORT = Environment.GetEnvironmentVariable("BACKEND_PORT") ?? throw new Exception("BACKEND_PORT is null!");
+        public static string FRONTEND_PORT = Environment.GetEnvironmentVariable("FRONTEND_PORT") ?? throw new Exception("FRONTEND_PORT is null!");
 
         public const string READ_FAIL = "Lấy bản ghi thất bại"; //Unknown reason
         public const string ADD_FAIL = "Thêm bản ghi thất bại"; //Unknown reason

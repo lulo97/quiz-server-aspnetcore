@@ -4,6 +4,7 @@ using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821195147_SeedAdminUser")]
+    partial class SeedAdminUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,34 +207,34 @@ namespace Backend.Migrations
                         new
                         {
                             DifficultLevelId = new Guid("af69c0ce-a5d9-49b6-9c91-aec6bb73d27f"),
-                            CreatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(189),
+                            CreatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(177),
                             Description = "Nhận biết, nhắc lại được kiến thức, kĩ năng đã học.",
                             Name = "Nhận biết",
-                            UpdatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(203)
+                            UpdatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(191)
                         },
                         new
                         {
                             DifficultLevelId = new Guid("5e0d9a7a-e16d-4e54-be4d-839fa04f5a37"),
-                            CreatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(251),
+                            CreatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(252),
                             Description = "Hiểu kiến thức, kĩ năng đã học. trình bày, giải thích được kiến thức theo cách hiểu của cá nhân.",
                             Name = "Đọc hiểu",
-                            UpdatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(252)
+                            UpdatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(252)
                         },
                         new
                         {
                             DifficultLevelId = new Guid("09593f78-2de4-48dc-9d79-72e72fa33607"),
-                            CreatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(268),
+                            CreatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(268),
                             Description = "Biết vận dụng kiến thức, kĩ năng đã học để giải quyết những vấn dề quen thuộc, tương tự trong học tập, cuộc sống.",
                             Name = "Vận dụng",
-                            UpdatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(269)
+                            UpdatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(268)
                         },
                         new
                         {
                             DifficultLevelId = new Guid("47bd5bef-43b8-48a1-8495-b2a09d2f1177"),
-                            CreatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(282),
+                            CreatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(284),
                             Description = "Vận dụng các kiến thức, kĩ năng đã học để giải quyết vấn đề mới hoặc đưa ra những phản hồi hợp lý trong học tập, cuộc sống một cách linh hoạt.",
                             Name = "Vận dụng cao",
-                            UpdatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(283)
+                            UpdatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(285)
                         });
                 });
 
@@ -427,9 +430,6 @@ namespace Backend.Migrations
                     b.Property<string>("AudioUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -438,6 +438,9 @@ namespace Backend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("DifficultLevelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EducationLevelId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Explanation")
@@ -910,8 +913,8 @@ namespace Backend.Migrations
                         {
                             Id = new Guid("1e874e00-f545-4a55-9a92-9a70afb606b0"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3c324c8b-7323-425e-853a-1188f39f38ec",
-                            CreatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(335),
+                            ConcurrencyStamp = "90885393-8aa7-40aa-8d91-3c0748e0b1bf",
+                            CreatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(331),
                             Email = "luongpysl2@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "admin",
@@ -919,11 +922,11 @@ namespace Backend.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "LUONGPYSL2@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDwB4Atw9diWtvRXXS9Yoz+OnF+F2eleZInkvk1+abhnUiapdVWAoG0SEL4SOKs8Uw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENRaPQ3fWOEGw4j9JbqcTGCQRHEJIDD9M/AvXrwxuKAK4FVP7tM06g6/3t2ss4lJzQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "75a365aa-5e32-4f29-bcfe-536a8474c3e3",
+                            SecurityStamp = "415724b8-c1de-4d98-806a-e2378e3fdc14",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2024, 8, 24, 0, 8, 53, 441, DateTimeKind.Local).AddTicks(336),
+                            UpdatedAt = new DateTime(2024, 8, 22, 2, 51, 47, 25, DateTimeKind.Local).AddTicks(332),
                             UserName = "admin"
                         });
                 });

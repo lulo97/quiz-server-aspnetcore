@@ -1,10 +1,13 @@
 ﻿using Backend.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Reflection.Metadata;
 
 namespace Backend.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -55,6 +58,27 @@ namespace Backend.Data
                 Description = "Vận dụng các kiến thức, kĩ năng đã học để giải quyết vấn đề mới hoặc đưa ra những phản hồi hợp lý trong học tập, cuộc sống một cách linh hoạt.",
             });
 
+            //Add admin user
+            var user_admin = new User
+            {
+                Id = Guid.Parse("1e874e00-f545-4a55-9a92-9a70afb606b0"),
+                UserName = "admin",
+                Fullname = "admin",
+                NormalizedUserName = "ADMIN",
+                Email = "luongpysl2@gmail.com",
+                NormalizedEmail = "LUONGPYSL2@GMAIL.COM",
+                EmailConfirmed = true,
+                ImageUrl = "https://lh3.googleusercontent.com/a/ACg8ocLV8p2S7WsFyfspBGUcvR-Nh2ojZP7d51i8NqdoPCq-jZ9PUP4=s432-c-no",
+                SecurityStamp = Guid.NewGuid().ToString(),
+                ConcurrencyStamp = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+            var password = new PasswordHasher<User>();
+            var hashed = password.HashPassword(user_admin, "123");
+            user_admin.PasswordHash = hashed;
+            modelBuilder.Entity<User>().HasData(user_admin);
+
             //Add FK
             modelBuilder.Entity<SubSubject>()
                 .HasOne(ss => ss.Subject) // Each SubSubject has one Subject
@@ -95,7 +119,6 @@ namespace Backend.Data
         public DbSet<SubSubject> SubSubjects { get; set; }
         public DbSet<Time> Times { get; set; }
         public DbSet<QuestionType> QuestionTypes { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<UserRoom> UserRooms { get; set; }
         public DbSet<ApplicationConst> ApplicationConsts { get; set; }
     }

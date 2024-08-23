@@ -1,20 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Models
 {
-    public class User
+    //Email, UserName, Primary Key already implement in IdentityUser
+    public class User: IdentityUser<Guid>
     {
-        [Key]
-        public Guid UserId { get; set; } = Guid.NewGuid();
-
         [Required]
         public string? Fullname { get; set; }
-
-        [Required]
-        public string? Username { get; set; }
-        
-        public string? Email { get; set; }
 
         public string? Biography { get; set; }
 

@@ -9,11 +9,13 @@ Generate controller by model:
 - Run command: dotnet aspnet-codegenerator controller -name ControllerName -async -api -m ModelName -dc ApplicationDbContext -outDir Controllers
 */
 
-using DotNetEnv;
 using Backend.Data;
+using Backend.Models;
+using DotNetEnv;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using static Backend.Utils.Const;
 using System.Text.Json.Serialization;
+using static Backend.Utils.Const;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,11 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add identity
+builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -35,6 +42,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configure port
 Env.Load(builder.Configuration.GetValue<string>("EnvPath"));
 builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(Int32.Parse(BACKEND_PORT)));
+
+// Cookie
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 
 var app = builder.Build();
 
@@ -49,9 +63,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+//Login --> Create cookie to client
+//Get current user id --> User.FindFirstValue(ClaimTypes.NameIdentifier)
+//Requirement:
+// Client: Every http request must have credential true ( { withCredentials: true } for Angular )
+// Server: Allow credential to client address ( AllowCredentials() )
 app.UseCors(x => x
-    .AllowAnyOrigin()
+    .SetIsOriginAllowed(origin => true) //Allow any origin can set credential 
+    .AllowAnyHeader()
     .AllowAnyMethod()
-    .AllowAnyHeader());
+    .AllowCredentials());
 
 app.Run();

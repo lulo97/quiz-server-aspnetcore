@@ -12,9 +12,8 @@ namespace Backend.Models
 
         public Guid TypeId { get; set; }
 
+        //Can extract Subject and Education from SubSubject
         public Guid SubSubjectId { get; set; }
-
-        public Guid EducationLevelId { get; set; }
 
         public Guid DifficultLevelId { get; set; }
 
@@ -25,6 +24,8 @@ namespace Backend.Models
         public Guid PointId { get; set; }
 
         public Guid PenaltyPointId { get; set; }
+
+        public Guid BookId { get; set; }
 
         //Metadata
         [Required]

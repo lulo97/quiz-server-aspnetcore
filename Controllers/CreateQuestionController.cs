@@ -41,5 +41,66 @@ namespace Backend.Controllers
                 return Problem(READ_FAIL);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PostQuestion([FromForm] CreateQuestionPostModel request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Invalid request data.");
+            }
+
+            // Handle the image and audio files if they are provided
+            if (request.ImageFile != null)
+            {
+                // Save the image file or process it
+                // Example: var imagePath = Path.Combine("path-to-save", request.ImageFile.FileName);
+                // using (var stream = new FileStream(imagePath, FileMode.Create))
+                // {
+                //     await request.ImageFile.CopyToAsync(stream);
+                // }
+            }
+
+            if (request.AudioFile != null)
+            {
+                // Save the audio file or process it
+                // Example: var audioPath = Path.Combine("path-to-save", request.AudioFile.FileName);
+                // using (var stream = new FileStream(audioPath, FileMode.Create))
+                // {
+                //     await request.AudioFile.CopyToAsync(stream);
+                // }
+            }
+
+            // Process other data
+            // Example: Save the question and answers to the database
+
+            return Ok();
+        }
+
     }
+
+    public class CreateQuestionPostModel
+    {
+        public string? QuestionContent { get; set; }
+        public List<AnswerModel> Answers { get; set; } = new List<AnswerModel>();
+        public string? Explanation { get; set; }
+        public IFormFile? ImageFile { get; set; }
+        public IFormFile? AudioFile { get; set; }
+        public Guid UserId { get; set; }
+        public Guid DifficultLevelId { get; set; }
+        public Guid SubSubjectId { get; set; }
+        public Guid QuestionTypeId { get; set; }
+        public Guid LanguageId { get; set; }
+        public Guid PointId { get; set; }
+        public Guid PenaltyPointId { get; set; }
+        public Guid BookId { get; set; }
+    }
+
+    public class AnswerModel
+    {
+        public string? Content { get; set; }
+        public bool IsCorrect { get; set; }
+        public Guid Id { get; set; }
+    }
+
 }
